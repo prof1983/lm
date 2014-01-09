@@ -8,3 +8,7 @@ ahnames.com - prof1983
 
 Хостинг
 jino.ru - prof1983
+
+Валидаторы
+validator.w3.org
+validator.nu
