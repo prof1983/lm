@@ -1,0 +1,113 @@
+// LibreMoney NodeJs start page 0.1
+
+// ---- Functions ----
+
+function Body() {
+	return '<body>'+
+		/*
+		<header>
+		<div id="header">
+		<a class="amenu" href="http://ya.ru/">Item1</a>
+		<a class="amenu" href="http://ya.ru/">Item2</a>
+		<a class="amenu" href="http://ya.ru/">Item3</a>
+		<a class="amenu" href="http://ya.ru/">Выход</a>
+		</div>
+		</header>
+		*/
+		BodyAuth()+
+		BodyMain()+
+		BodyFooter()+
+		'</body>';
+}
+
+function BodyAuth() {
+	return '<div class="auth">'+
+		'<a href="/auth/vk" class="oauth oauth-vkontakte first" rel="nofollow" title="Войти через ВКонтакте"></a>'+
+		/*
+		<a class="oauth oauth-mail" rel="nofollow" title="Войти через Mail.Ru" href="/auth/mail"></a>
+		<a class="oauth oauth-facebook" rel="nofollow" title="Войти через Facebook" href="/auth/facebook"></a>
+		<a rel="nofollow" class="oauth oauth-twitter last" title="Войти через Twitter" href="/auth/twitter"></a>
+		*/
+		'</div>';
+	// chtodelat.com
+}
+
+function BodyFooter() {
+	return '<footer>'+
+		'&copy; LibreMoney 2014'+
+		'</footer>';
+}
+
+function BodyMain() {
+	return '<main>'+
+
+		'<h1>LibreMoney</h1>'+
+
+		'<h2>Инструменты</h2>'+
+
+		'<ul>'+
+		'<li><a href="https://github.com/node-inspector/node-inspector">Отладчик для NodeJs</a></li>'+
+		'</ul>'+
+
+		'<h2>Полезное</h2>'+
+
+		'<ul>'+
+		'<li><a href="http://habrahabr.ru/post/138071/">Разработка WEB-проекта на Node.JS: Часть 1</a></li>'+
+		'<li><a href=""></a></li>'+
+		'</ul>'+
+
+		'<br/>'+
+		'<br/>'+
+		'<br/>'+
+
+		'<p>Сайт в разработке.</p>'+
+		'<img alt="Сайт в разработке" src="img/work-128.png" />'+
+
+		'</main>';
+}
+
+function Main(response) {
+
+	function Head() {
+		return '<head>'+
+				//<meta name="viewport" content="width=device-width, minimum-scale=0.40, initial-scale=0.40" />
+				'<meta charset="utf-8" />'+
+				'<title>LibreMoney</title>'+
+				'<style>'+
+					'@import url(\'css/main.css\');'+
+				'</style>'+
+			'</head>';
+	}
+
+	console.log("Request handler 'start' was called.");
+
+	var body = '<!DOCTYPE html>'+
+		'<html>'+
+		Head()+
+		Body()+
+		'</html>';
+
+	/*
+	var body = '<html>'+
+		'<head>'+
+			'<meta charset="UTF-8"/>'+
+			'<title>LibreMoney</title>'+
+		'</head>'+
+		'<body>'+
+			'<form action="/upload" enctype="multipart/form-data" method="post">'+
+				'<input type="file" name="upload" multiple="multiple"/>'+
+				'<input type="submit" value="Upload file"/>'+
+			'</form>'+
+		'</body>'+
+		'</html>';
+	*/
+
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write(body);
+		response.end();
+}
+
+
+// ---- Exports ----
+
+exports.Main = Main;
