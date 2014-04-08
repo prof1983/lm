@@ -1,0 +1,971 @@
+LibreMoney - Структура БД - 0.1
+
+lm_account - счета
+lm_account_group - группы счетов
+lm_commodity - статьи
+lm_commodity_group - группы статей
+lm_transaction - проводки
+lm_transaction_item - элементы проводки
+
+CREATE TABLE lm_transaction (
+	ID Integer NOT NULL, -- Идентификатор
+	TRANSFERDATE Date NOT NULL, -- Дата
+	USERMT Integer NOT NULL, -- идентификатор пользователя
+	MONEYTYPE Integer, -- тип валюты
+
+	TOTALITEMS Double precision, -- всего элементов
+	ACCOUNT Integer NOT NULL, -- счет
+	COMMONTRADEPLACE Integer, -- место расхода/дохода
+	TOTAL Double precision, -- сумма
+
+	DISC Double precision, -- EXPENCE only
+	DISCPERCENT Double precision, -- EXPENCE only
+	DISCTYPE Integer, -- EXPENCE only
+	DISCINPRICE Integer, -- EXPENCE only
+
+	SOURCE Integer NOT NULL, -- MONEYTRANSFER only
+	DEST Integer NOT NULL, -- MONEYTRANSFER only
+	AMOUNT Double precision NOT NULL, -- MONEYTRANSFER only
+	FEE Double precision, -- MONEYTRANSFER only
+	FEETYPE Integer, -- MONEYTRANSFER only
+	FEEPERCENT Double precision, -- MONEYTRANSFER only
+	FEECOMM Integer, -- MONEYTRANSFER only
+	DESTAMOUNT Double precision NOT NULL, -- MONEYTRANSFER only
+	CALCFIELD Integer, -- MONEYTRANSFER only
+	ORGANIZATION Integer NOT NULL, -- MONEYTRANSFER only
+	FEEDESTPERCENT Double precision, -- MONEYTRANSFER only
+	COMM Integer NOT NULL, -- MONEYTRANSFER only
+	CONSTRAINT PK_MONEYTRANSFER PRIMARY KEY (ID) -- MONEYTRANSFER only
+
+
+	OBJVERSION Integer,
+	REMARKS Varchar(512),
+	PRIMARY KEY (ID)
+);
+
+CREATE TABLE lm_transaction_item (
+	id INT NOT NULL,
+
+	COMM Integer,
+	TOTAL Double precision, -- всего
+	TRANSFERDATE Date, -- дата
+	QTY Double precision NOT NULL,
+	price INT, -- цена за единицу
+	IDX Integer,
+	value INT NOT NULL, -- значение расхода/дохода EXPENSE/INCOME
+
+	DISC Double precision, -- EXPENCE only
+	
+	TRADEPLACE Integer NOT NULL, -- место расхода/дохода
+	REMARKS Varchar(4096), -- примечание
+
+	PRIMARY KEY (ID)
+);
+
+
+
+
+CREATE TABLE EXPENSE (
+	ID Integer NOT NULL,
+	TRANSFERDATE Date NOT NULL,
+	USERMT Integer NOT NULL,
+	TOTALITEMS Double precision,
+	OBJVERSION Integer,
+	ACCOUNT Integer NOT NULL,
+	MONEYTYPE Integer,
+	DISC Double precision,
+	DISCPERCENT Double precision,
+	DISCTYPE Integer,
+	DISCINPRICE Integer,
+	COMMONTRADEPLACE Integer,
+	TOTAL Double precision,
+	REMARKS Varchar(512),
+	PRIMARY KEY (ID)
+);
+
+CREATE TABLE EXPENSEITEM (
+	ID Integer NOT NULL,
+	QTY Double precision NOT NULL,
+	PRICE Double precision,
+	REMARKS Varchar(4096),
+	EXPENSE Integer NOT NULL,
+	COMM Integer,
+	TOTAL Double precision,
+	TRADEPLACE Integer NOT NULL,
+	DISC Double precision,
+	TRANSFERDATE Date,
+	IDX Integer,
+	PRIMARY KEY (ID)
+);
+
+CREATE TABLE INCOME (
+	ID Integer NOT NULL,
+	TRANSFERDATE Date NOT NULL,
+	USERMT Integer NOT NULL,
+	TOTALITEMS Double precision,
+	OBJVERSION Integer,
+	ACCOUNT Integer NOT NULL,
+	MONEYTYPE Integer,
+	COMMONTRADEPLACE Integer,
+	TOTAL Double precision,
+	REMARKS Varchar(512),
+	PRIMARY KEY (ID)
+);
+
+CREATE TABLE INCOMEITEM (
+	ID Integer NOT NULL,
+	REMARKS Varchar(4096),
+	INCOME Integer NOT NULL,
+	COMM Integer,
+	TOTAL Double precision,
+	TRADEPLACE Integer NOT NULL,
+	TRANSFERDATE Date,
+	QTY Double precision NOT NULL,
+	PRICE Double precision,
+	IDX Integer,
+	PRIMARY KEY (ID)
+);
+
+CREATE TABLE MONEYTRANSFER (
+	   ID Integer NOT NULL,
+	   SOURCE Integer NOT NULL,
+	   DEST Integer NOT NULL,
+	   REMARKS Varchar(512),
+	   OBJVERSION Integer,
+	   AMOUNT Double precision NOT NULL,
+	   TRANSFERDATE Date NOT NULL,
+	   USERMT Integer NOT NULL,
+	   MONEYTYPE Integer,
+	   FEE Double precision,
+	   FEETYPE Integer,
+	   FEEPERCENT Double precision,
+	   FEECOMM Integer,
+	   DESTAMOUNT Double precision NOT NULL,
+	   CALCFIELD Integer,
+	   ORGANIZATION Integer NOT NULL,
+	   FEEDESTPERCENT Double precision,
+	   COMM Integer NOT NULL,
+	   CONSTRAINT PK_MONEYTRANSFER PRIMARY KEY (ID)
+);
+
+
+
+
+==== MoneyTracker ====
+0. Стартовое информационное окно
+1. Счета
+2. Статьи
+3. Доходы/Расходы/Переводы/Сводный
+4. Календарь
+5. Бюджеты (планирование)
+6. Отчеты
+
+== Доходы/Расходы ==
+0. Дата
+1. Список
+   - Статья
+   - Кол-во
+   - Цена
+   - Сумма
+   - Примечание
+2. Счет
+
+== Планирование ==
+0. Период (месяц, квартал)
+= Доходы/Расходы =
+1. Статьи
+2. План
+3. Факт
+4. Выполнение, %
+= Итоги =
+1. Доходы: план, факт
+2. Расходы: план, факт
+3. Прибыль: план, факт (сбережения)
+- Ежедневные расходы -
+- По бюджету
+- По факту
+- Рекомендуется трать не более Х руб в день, чтобы остаться в рамках бюджета
+
+
+==== Keepersoft homebuh ====
+Accounts - счета
+AccountTransfer - переводы
+Expences - расходы
+Income - доходы
+Categories - категории (статьи)
+Debtors - должники
+Creditors - кредиторы
+
+PlanExpences - расходы
+PlanIncome - доходы
+
+
+==== MoneyTracker Database ====
+
+Account - Счета
+AccountGroup - Группы счетов
+AccountTotalByDate
+Borrowing - Долги/Займы
+BorrowingPayment - платежи по долгам
+Budget - Планируемый бюджет
+BudgetConstraint
+BudgetNode
+BudgetNodeItem
+CalendarEvent
+CalendarExpense
+...
+CommGroup - Группы статей
+Commodity - Статьи - Продукт, товар (категории)
+CommPrice - Стоимость единицы товара
+Expense - Расход
+ExpenseItem - Элемент расхода
+ExpensePlan - Планируемый расход
+ExpensePlanItem - Элемент планируемого расхода
+Income - Доход
+IncomeItem - Элемент дохода
+IncomePlan - Планируемый доход
+IncomePlanItem - Элемент планируемого дохода
+Lending - Кредитование
+LendingPayment - Платежи по кредиту
+MoneyExchange - Обмен валют
+MoneyTransfer - Перевод денег
+MoneyTransferPlan - Планирование
+MoneyType - тип валюты (руб, долл, евро)
+MoneyTypeRate
+MoneyTypeRateSource
+Organization - Организации
+OrganizationGroup - Группы организаций
+UnitType - единица измерения
+
+
+
+
+================================
+
+CREATE TABLE ACCOUNT (
+	   ID Integer NOT NULL,
+	   NAME Varchar(64) NOT NULL,
+	   BALANCE Double precision,
+	   NOTES Varchar(64),
+	   OBJVERSION Integer,
+	   MONEYTYPE Integer NOT NULL,
+	   LASTCORRECTBALCOMM Integer,
+	   LASTCORRECTBALORG Integer,
+	   TOTALINVALIDDATE Date,
+	   PARENT Integer,
+	   NAME_MIR Varchar(64),
+	   CONSTRAINT PK_ACCOUNT PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE ACCOUNTGROUP (
+	   ID Integer NOT NULL,
+	   NAME Varchar(64),
+	   PARENT Integer,
+	   OBJVERSION Integer,
+	   NAME_MIR Varchar(64),
+	   CONSTRAINT PK_ACCOUNTGROUP PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE ACCOUNTTOTALBYDATE (
+	   ACCOUNT Integer NOT NULL,
+	   TOTAL Double precision NOT NULL,
+	   TOTALDATE Date NOT NULL,
+	   CONSTRAINT UNQ_ATD_DATE_ACCOUNT UNIQUE (ACCOUNT,TOTALDATE)
+);
+
+
+CREATE TABLE BORROWING (
+	   ID Integer NOT NULL,
+	   ACCOUNT Integer NOT NULL,
+	   AUTOBUILDPAYMENTS Integer NOT NULL,
+	   BALANCE Double precision NOT NULL,
+	   CLOSEDATE Date,
+	   COMM Integer NOT NULL,
+	   CREDITDATE Date NOT NULL,
+	   CREDITSUM Double precision NOT NULL,
+	   INTERESTRATE Double precision,
+	   INTERESTTYPE Integer,
+	   MONEYTYPE Integer NOT NULL,
+	   NAME Varchar(128) NOT NULL,
+	   NAME_MIR Varchar(128),
+	   ORGANIZATION Integer NOT NULL,
+	   PAYMENTBASESUM Double precision,
+	   PAYMENTCOUNT Integer,
+	   PAYMENTSSTATE Integer NOT NULL,
+	   PERIODICITY Integer NOT NULL,
+	   PERIODICITYDAYS Integer,
+	   REMARKS Varchar(512),
+	   USERMT Integer NOT NULL,
+	   OBJVERSION Integer,
+	   ISCLOSED Integer NOT NULL,
+	   INTERESTBASE Integer NOT NULL,
+	   LOCKAUTOCALCPAYMENT Integer NOT NULL,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE BORROWINGPAYMENT (
+	   ID Integer NOT NULL,
+	   ACCOUNT Integer,
+	   CALENDARLABEL Integer,
+	   CREDIT Integer NOT NULL,
+	   GENERATED Integer NOT NULL,
+	   HIDDENINCALENDAR Integer NOT NULL,
+	   INDX Integer NOT NULL,
+	   INTEREST Double precision,
+	   INTERESTCOMM Integer,
+	   PAYMENTDATE Date NOT NULL,
+	   PRINCIPAL Double precision,
+	   PRINCIPALCOMM Integer,
+	   REMARKS Varchar(512),
+	   STATUS Integer NOT NULL,
+	   TOTALPAID Double precision,
+	   USERMT Integer,
+	   PAYMENTTYPE Integer NOT NULL,
+	   INCREASE Double precision,
+	   INCREASECOMM Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE BUDGET (
+	   ID Integer NOT NULL,
+	   ACCOUNTS Blob SUB_TYPE 0 SEGMENT SIZE 8192,
+	   ANCHORDATE Date,
+	   ENDDATE Date,
+	   INCLUDEEXCHANGEFEE Integer NOT NULL,
+	   INCLUDETRANSFERFEE Integer NOT NULL,
+	   MONEYTYPE Integer NOT NULL,
+	   NAME Varchar(128) NOT NULL,
+	   NAME_MIR Varchar(128),
+	   ORGANIZATIONS Blob SUB_TYPE 0 SEGMENT SIZE 8192,
+	   PERIODTYPE Integer NOT NULL,
+	   PERIODICITYDAYS Integer,
+	   USERSMT Blob SUB_TYPE 0 SEGMENT SIZE 8192,
+	   OBJVERSION Integer,
+	   INCLUDEEXCHANGES Integer NOT NULL,
+	   INCLUDEEXPENSES Integer NOT NULL,
+	   INCLUDEINCOME Integer NOT NULL,
+	   INCLUDETRANSFERS Integer NOT NULL,
+	   INCLUDECREDITPRINCIPAL Integer NOT NULL,
+	   INCLUDECREDITINTEREST Integer NOT NULL,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE BUDGETCONSTRAINT (
+	   ID Integer NOT NULL,
+	   BUDGET Integer NOT NULL,
+	   CONSTRAINTCALENDAR Integer NOT NULL,
+	   CONSTRAINTTYPE Integer NOT NULL,
+	   ISINCOME Integer NOT NULL,
+	   TARGET Varchar(64),
+	   TARGETTYPE Integer NOT NULL,
+	   CONSTRVALUE Double precision NOT NULL,
+	   EXCLUDED Integer,
+	   REMARKS Varchar(512),
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE BUDGETNODE (
+	   ID Integer NOT NULL,
+	   BUDGET Integer NOT NULL,
+	   ISINCOME Integer NOT NULL,
+	   PARENT Integer,
+	   NAME Varchar(128) NOT NULL,
+	   NAME_MIR Varchar(128),
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE BUDGETNODEITEM (
+	   ID Integer NOT NULL,
+	   BUDGET Integer NOT NULL,
+	   ISINCOME Integer NOT NULL,
+	   PARENT Integer,
+	   DELETED Integer NOT NULL,
+	   ITEM Varchar(64),
+	   ITEMTYPE Integer NOT NULL,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDAREVENT (
+	   ID Integer NOT NULL,
+	   STARTDATE Date NOT NULL,
+	   ENDDATE Date,
+	   PERIODICITY Integer NOT NULL,
+	   USERMT Integer,
+	   OBJVERSION Integer,
+	   PERIODICITYDAYS Integer,
+	   SUBJECTTYPE Varchar(32) NOT NULL,
+	   REMARKS Varchar(512),
+	   REMINDTIME Time,
+	   CALENDARLABEL Integer,
+	   CONSTRAINT PK_CALENDAREVENT PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDAREXPENSE (
+	   ID Integer NOT NULL,
+	   CALENDAREVENT Integer NOT NULL,
+	   EXPENSEPLAN Integer NOT NULL,
+	   CONSTRAINT PK_CALENDAREXPENSE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDAREXPENSEEXECUTE (
+	   ID Integer NOT NULL,
+	   CALENDARREMIND Integer NOT NULL,
+	   EXPENSE Integer,
+	   PLANTOTAL Double precision,
+	   PLANMONEYTYPE Integer NOT NULL,
+	   PLANACCOUNT Integer,
+	   CONSTRAINT PK_CALENDAREXPENSEEXECUTE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDAREXPENSEEXECUTEITEM (
+	   ID Integer NOT NULL,
+	   EXPENSEEXECUTE Integer NOT NULL,
+	   COMM Integer NOT NULL,
+	   QTY Double precision,
+	   PRICE Double precision,
+	   TOTAL Double precision,
+	   TRADEPLACE Integer NOT NULL,
+	   REMARKS Varchar(128),
+	   IDX Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDARINCOME (
+	   ID Integer NOT NULL,
+	   INCOMEPLAN Integer NOT NULL,
+	   CALENDAREVENT Integer NOT NULL,
+	   CONSTRAINT PK_CALENDARINCOME PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDARINCOMEEXECUTE (
+	   ID Integer NOT NULL,
+	   CALENDARREMIND Integer NOT NULL,
+	   INCOME Integer,
+	   PLANTOTAL Double precision,
+	   PLANMONEYTYPE Integer NOT NULL,
+	   PLANACCOUNT Integer,
+	   CONSTRAINT PK_CALENDARINCOMEEXECUTE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDARINCOMEEXECUTEITEM (
+	   ID Integer NOT NULL,
+	   INCOMEEXECUTE Integer NOT NULL,
+	   COMM Integer NOT NULL,
+	   TOTAL Double precision,
+	   TRADEPLACE Integer NOT NULL,
+	   REMARKS Varchar(128),
+	   QTY Double precision NOT NULL,
+	   PRICE Double precision,
+	   IDX Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDARLABEL (
+	   ID Integer NOT NULL,
+	   NAME Varchar(128) NOT NULL,
+	   COLOR Integer NOT NULL,
+	   OBJVERSION Integer,
+	   NAME_MIR Varchar(128),
+	   CONSTRAINT PK_CALENDARLABEL PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDARMONEYTRANSFER (
+	   ID Integer NOT NULL,
+	   CALENDAREVENT Integer NOT NULL,
+	   MONEYTRANSFERPLAN Integer NOT NULL,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDARMONEYTRANSFEREXECUTE (
+	   ID Integer NOT NULL,
+	   CALENDARREMIND Integer NOT NULL,
+	   MONEYTRANSFER Integer,
+	   PLANAMOUNT Double precision NOT NULL,
+	   PLANCOMM Integer,
+	   PLANDEST Integer,
+	   PLANDESTAMOUNT Double precision NOT NULL,
+	   PLANFEECOMM Integer,
+	   PLANMONEYTYPE Integer NOT NULL,
+	   PLANORGANIZATION Integer,
+	   PLANSOURCE Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDARNOTE (
+	   ID Integer NOT NULL,
+	   CALENDAREVENT Integer NOT NULL,
+	   SUBJECT Varchar(128) NOT NULL,
+	   CONSTRAINT PK_CALENDARNOTE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE CALENDARREMIND (
+	   ID Integer NOT NULL,
+	   CALENDAREVENT Integer NOT NULL,
+	   GENERATEDDATE Date NOT NULL,
+	   DELAYEDDATE Date NOT NULL,
+	   OBJVERSION Integer,
+	   EXECUTED Integer,
+	   DELETED Integer,
+	   REMARKS Varchar(512),
+	   DELAYEDTIME Time,
+	   CALENDARLABEL Integer,
+	   USERMT Integer,
+	   CONSTRAINT PK_CALENDARREMIND PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE COMMGROUP (
+	   ID Integer NOT NULL,
+	   NAME Varchar(64) NOT NULL,
+	   PARENT Integer,
+	   OBJVERSION Integer,
+	   NAME_MIR Varchar(64),
+	   CONSTRAINT PK_COMMGROUP PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE COMMODITY (
+	   ID Integer NOT NULL,
+	   NAME Varchar(128) NOT NULL,
+	   UNITTYPE Integer,
+	   PARENT Integer,
+	   OBJVERSION Integer,
+	   DEFAULTTRADEPLACE Integer,
+	   DEFAULTPRICE Double precision,
+	   DEFAULTMONEYTYPE Integer,
+	   DEFAULTQTY Double precision,
+	   NAME_MIR Varchar(128),
+	   REMARKS Varchar(512),
+	   RECALCATTR Integer NOT NULL,
+	   CONSTRAINT PK_COMMODITY PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE COMMPRICE (
+	   ID Integer NOT NULL,
+	   PRICE Double precision NOT NULL,
+	   COMM Integer NOT NULL,
+	   TRADEPLACE Integer NOT NULL,
+	   MONEYTYPE Integer NOT NULL,
+	   CONSTRAINT PK_COMMPRICE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE DBINFO (
+	   ID Integer NOT NULL,
+	   MAJORVERSION Integer NOT NULL,
+	   MINORVERSION Integer NOT NULL,
+	   RELEASEVERSION Integer NOT NULL,
+	   CREATEDATE TIMESTAMP,
+	   PARTNERCODE Varchar(16),
+	   UNREGINSERT Integer,
+	   LASTUPDATED TIMESTAMP,
+	   REGINFO Blob SUB_TYPE 0 SEGMENT SIZE 8192,
+	   CONSTRAINT PK_DBINFO PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE DEFAULTSETTINGS (
+	   ID Integer NOT NULL,
+	   USERID Integer,
+	   OBJVERSION Integer,
+	   CONSTRAINT PK_DEFAULTSETTINGS PRIMARY KEY (ID),
+	   CONSTRAINT UNQ_DEFAULTSETTINGS_USERID UNIQUE (USERID)
+);
+
+
+CREATE TABLE DEFAULTSETTINGSITEM (
+	   ID Integer NOT NULL,
+	   NAME Varchar(64) NOT NULL,
+	   DATA Blob SUB_TYPE 0,
+	   DEFAULTSETTINGS Integer NOT NULL,
+	   CONSTRAINT PK_DEFAULTSETTINGSITEM PRIMARY KEY (ID),
+	   CONSTRAINT UNQ_DEFAULTSETTINGSITEM_NAME UNIQUE (NAME,DEFAULTSETTINGS)
+);
+
+
+CREATE TABLE EXPENSE (
+	   ID Integer NOT NULL,
+	   TRANSFERDATE Date NOT NULL,
+	   USERMT Integer NOT NULL,
+	   TOTALITEMS Double precision,
+	   OBJVERSION Integer,
+	   ACCOUNT Integer NOT NULL,
+	   MONEYTYPE Integer,
+	   DISC Double precision,
+	   DISCPERCENT Double precision,
+	   DISCTYPE Integer,
+	   DISCINPRICE Integer,
+	   COMMONTRADEPLACE Integer,
+	   TOTAL Double precision,
+	   REMARKS Varchar(512),
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE EXPENSEITEM (
+	   ID Integer NOT NULL,
+	   QTY Double precision NOT NULL,
+	   PRICE Double precision,
+	   REMARKS Varchar(4096),
+	   EXPENSE Integer NOT NULL,
+	   COMM Integer,
+	   TOTAL Double precision,
+	   TRADEPLACE Integer NOT NULL,
+	   DISC Double precision,
+	   TRANSFERDATE Date,
+	   IDX Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE EXPENSEPLAN (
+	   ID Integer NOT NULL,
+	   OBJVERSION Integer,
+	   NAME Varchar(128) NOT NULL,
+	   MONEYTYPE Integer NOT NULL,
+	   ACCOUNT Integer,
+	   COMMONTRADEPLACE Integer,
+	   NAME_MIR Varchar(128),
+	   TOTAL Double precision,
+	   UPDATEPRICES Integer,
+	   CONSTRAINT PK_EXPENSEPLAN PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE EXPENSEPLANITEM (
+	   ID Integer NOT NULL,
+	   EXPENSEPLAN Integer NOT NULL,
+	   COMM Integer NOT NULL,
+	   QTY Double precision NOT NULL,
+	   TRADEPLACE Integer NOT NULL,
+	   REMARKS Varchar(128),
+	   PRICE Double precision,
+	   TOTAL Double precision,
+	   IDX Integer,
+	   CONSTRAINT PK_EXPENSEPLANITEM PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE INCOME (
+	   ID Integer NOT NULL,
+	   TRANSFERDATE Date NOT NULL,
+	   USERMT Integer NOT NULL,
+	   TOTALITEMS Double precision,
+	   OBJVERSION Integer,
+	   ACCOUNT Integer NOT NULL,
+	   MONEYTYPE Integer,
+	   COMMONTRADEPLACE Integer,
+	   TOTAL Double precision,
+	   REMARKS Varchar(512),
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE INCOMEITEM (
+	   ID Integer NOT NULL,
+	   REMARKS Varchar(4096),
+	   INCOME Integer NOT NULL,
+	   COMM Integer,
+	   TOTAL Double precision,
+	   TRADEPLACE Integer NOT NULL,
+	   TRANSFERDATE Date,
+	   QTY Double precision NOT NULL,
+	   PRICE Double precision,
+	   IDX Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE INCOMEPLAN (
+	   ID Integer NOT NULL,
+	   OBJVERSION Integer,
+	   NAME Varchar(128) NOT NULL,
+	   MONEYTYPE Integer NOT NULL,
+	   ACCOUNT Integer,
+	   COMMONTRADEPLACE Integer,
+	   NAME_MIR Varchar(128),
+	   TOTAL Double precision,
+	   UPDATEPRICES Integer,
+	   CONSTRAINT PK_INCOMEPLAN PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE INCOMEPLANITEM (
+	   ID Integer NOT NULL,
+	   INCOMEPLAN Integer NOT NULL,
+	   COMM Integer NOT NULL,
+	   TOTAL Double precision NOT NULL,
+	   TRADEPLACE Integer NOT NULL,
+	   REMARKS Varchar(128),
+	   QTY Double precision NOT NULL,
+	   PRICE Double precision,
+	   IDX Integer,
+	   CONSTRAINT PK_INCOMEPLANITEM PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE LENDING (
+	   ID Integer NOT NULL,
+	   ACCOUNT Integer NOT NULL,
+	   AUTOBUILDPAYMENTS Integer NOT NULL,
+	   BALANCE Double precision NOT NULL,
+	   CLOSEDATE Date,
+	   COMM Integer NOT NULL,
+	   CREDITDATE Date NOT NULL,
+	   CREDITSUM Double precision NOT NULL,
+	   INTERESTRATE Double precision,
+	   INTERESTTYPE Integer,
+	   MONEYTYPE Integer NOT NULL,
+	   NAME Varchar(128) NOT NULL,
+	   NAME_MIR Varchar(128),
+	   ORGANIZATION Integer NOT NULL,
+	   PAYMENTBASESUM Double precision,
+	   PAYMENTCOUNT Integer,
+	   PAYMENTSSTATE Integer NOT NULL,
+	   PERIODICITY Integer NOT NULL,
+	   PERIODICITYDAYS Integer,
+	   REMARKS Varchar(512),
+	   USERMT Integer NOT NULL,
+	   OBJVERSION Integer,
+	   ISCLOSED Integer NOT NULL,
+	   INTERESTBASE Integer NOT NULL,
+	   LOCKAUTOCALCPAYMENT Integer NOT NULL,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE LENDINGPAYMENT (
+	   ID Integer NOT NULL,
+	   ACCOUNT Integer,
+	   CALENDARLABEL Integer,
+	   CREDIT Integer NOT NULL,
+	   GENERATED Integer NOT NULL,
+	   HIDDENINCALENDAR Integer NOT NULL,
+	   INDX Integer NOT NULL,
+	   INTEREST Double precision,
+	   INTERESTCOMM Integer,
+	   PAYMENTDATE Date NOT NULL,
+	   PRINCIPAL Double precision,
+	   PRINCIPALCOMM Integer,
+	   REMARKS Varchar(512),
+	   STATUS Integer NOT NULL,
+	   TOTALPAID Double precision,
+	   USERMT Integer,
+	   PAYMENTTYPE Integer NOT NULL,
+	   INCREASE Double precision,
+	   INCREASECOMM Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE MONEYEXCHANGE (
+	   ID Integer NOT NULL,
+	   OBJVERSION Integer,
+	   EXCHANGEDATE Date NOT NULL,
+	   SOURCE Integer NOT NULL,
+	   DEST Integer NOT NULL,
+	   USERMT Integer NOT NULL,
+	   TRADEPLACE Integer NOT NULL,
+	   FEEPERCENT Double precision,
+	   RATE Double precision NOT NULL,
+	   SOURCEAMOUNT Double precision NOT NULL,
+	   DESTAMOUNT Double precision NOT NULL,
+	   SOURCEMONEYTYPE Integer NOT NULL,
+	   DESTMONEYTYPE Integer NOT NULL,
+	   REMARKS Varchar(512),
+	   FEECOMM Integer,
+	   FEE Double precision,
+	   CALCFIELD Integer,
+	   COMM Integer NOT NULL,
+	   CONSTRAINT PK_MONEYEXCHANGE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE MONEYTRANSFER (
+	   ID Integer NOT NULL,
+	   SOURCE Integer NOT NULL,
+	   DEST Integer NOT NULL,
+	   REMARKS Varchar(512),
+	   OBJVERSION Integer,
+	   AMOUNT Double precision NOT NULL,
+	   TRANSFERDATE Date NOT NULL,
+	   USERMT Integer NOT NULL,
+	   MONEYTYPE Integer,
+	   FEE Double precision,
+	   FEETYPE Integer,
+	   FEEPERCENT Double precision,
+	   FEECOMM Integer,
+	   DESTAMOUNT Double precision NOT NULL,
+	   CALCFIELD Integer,
+	   ORGANIZATION Integer NOT NULL,
+	   FEEDESTPERCENT Double precision,
+	   COMM Integer NOT NULL,
+	   CONSTRAINT PK_MONEYTRANSFER PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE MONEYTRANSFERPLAN (
+	   ID Integer NOT NULL,
+	   AMOUNT Double precision NOT NULL,
+	   CALCFIELD Integer,
+	   COMM Integer,
+	   DEST Integer,
+	   DESTAMOUNT Double precision NOT NULL,
+	   FEE Double precision,
+	   FEECOMM Integer,
+	   FEEDESTPERCENT Double precision,
+	   FEEPERCENT Double precision,
+	   FEETYPE Integer,
+	   MONEYTYPE Integer NOT NULL,
+	   ORGANIZATION Integer,
+	   SOURCE Integer,
+	   NAME Varchar(128) NOT NULL,
+	   NAME_MIR Varchar(128),
+	   OBJVERSION Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE MONEYTYPE (
+	   ID Integer NOT NULL,
+	   NAME Varchar(32) NOT NULL,
+	   CODE Varchar(16),
+	   SIGN Varchar(16) NOT NULL,
+	   OBJVERSION Integer,
+	   NAME_MIR Varchar(32),
+	   CONSTRAINT PK_MONEYTYPE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE MONEYTYPERATE (
+	   ID Integer NOT NULL,
+	   BUYMONEYTYPE Integer NOT NULL,
+	   SELLMONEYTYPE Integer NOT NULL,
+	   RATE Double precision NOT NULL,
+	   RATEDATE Date NOT NULL,
+	   OBJVERSION Integer,
+	   CONSTRAINT PK_MONEYTYPERATE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE MONEYTYPERATESOURCE (
+	   ID Integer NOT NULL,
+	   NAME Varchar(128) NOT NULL,
+	   NAME_MIR Varchar(128),
+	   CODE Varchar(8) NOT NULL,
+	   LASTUPDATED Date,
+	   UPDATEKIND Integer NOT NULL,
+	   UPDATEINTERVAL Integer,
+	   OBJVERSION Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE ORGANIZATION (
+	   ID Integer NOT NULL,
+	   NAME Varchar(128) NOT NULL,
+	   OBJVERSION Integer,
+	   EXCHANGEFEE Double precision,
+	   ADDRESS Varchar(1024),
+	   URL Varchar(256),
+	   EMAIL Varchar(64),
+	   PHONE Varchar(128),
+	   FAX Varchar(128),
+	   FULLNAME Varchar(128),
+	   REMARKS Varchar(4096),
+	   PARENT Integer,
+	   NAME_MIR Varchar(128),
+	   CONSTRAINT PK_ORGANIZATION PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE ORGANIZATIONGROUP (
+	   ID Integer NOT NULL,
+	   NAME Varchar(64) NOT NULL,
+	   PARENT Integer,
+	   OBJVERSION Integer,
+	   NAME_MIR Varchar(64),
+	   CONSTRAINT PK_ORGANIZATIONGROUP PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE STOREDREPORT (
+	   ID Integer NOT NULL,
+	   NAME Varchar(128) NOT NULL,
+	   NAME_MIR Varchar(128),
+	   REPORTTYPE Varchar(64),
+	   REPORTFILTER Blob SUB_TYPE 0 SEGMENT SIZE 8192,
+	   OBJVERSION Integer,
+	   PARENT Integer,
+	   REPORTFILTERREGCODE Integer,
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE STOREDREPORTGROUP (
+	   ID Integer NOT NULL,
+	   NAME Varchar(64) NOT NULL,
+	   PARENT Integer,
+	   OBJVERSION Integer,
+	   NAME_MIR Varchar(64),
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE UNITTYPE (
+	   ID Integer NOT NULL,
+	   NAME Varchar(32) NOT NULL,
+	   SHORTNAME Varchar(8) NOT NULL,
+	   OBJVERSION Integer,
+	   NAME_MIR Varchar(32),
+	   RECALCATTR Integer NOT NULL,
+	   CONSTRAINT PK_UNITTYPE PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE USERMT (
+	   ID Integer NOT NULL,
+	   NAME Varchar(32) NOT NULL,
+	   OBJVERSION Integer,
+	   PASSWORDHASH Blob SUB_TYPE 0 SEGMENT SIZE 8192,
+	   NAME_MIR Varchar(32),
+	   PRIMARY KEY (ID)
+);
+
+
+CREATE TABLE USERSETTINGS (
+	   ID Integer NOT NULL,
+	   SETTINGSKEY Varchar(128) NOT NULL,
+	   USERID Integer,
+	   DATA Blob SUB_TYPE 0 SEGMENT SIZE 8192,
+	   PRIMARY KEY (ID),
+	   CONSTRAINT UNIQUEUSERSETTINGS UNIQUE (SETTINGSKEY,USERID)
+);
+
+
+CREATE TABLE USERSETTINGSCODE (
+	   ID Integer NOT NULL,
+	   USERSETTINGS Integer NOT NULL,
+	   REGCODE Integer NOT NULL,
+	   PRIMARY KEY (ID)
+);
