@@ -7,6 +7,9 @@ libremoney.org
 ahnames.com - prof1983
 
 Хостинг
+-- libremoney.com --
+hostinger.ru (PHP+MySQL+Free) - prof1983
+-- libremoney.org, libremoney.net --
 jino.ru - prof1983
 
 Валидаторы
