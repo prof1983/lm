@@ -1,4 +1,4 @@
 // LibreMoney 0.0.1
 
-var server = require("./server/server");
-server.start(8080);
+var Server = require("./server/server");
+Server.Start(8080);
